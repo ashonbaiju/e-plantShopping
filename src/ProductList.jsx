@@ -1,9 +1,25 @@
-import React, { useState, useEffect } from 'react';
-import './ProductList.css'
+import React, { useState } from 'react';
+import { useDispatch } from 'react-redux';
+import { addItem } from '../redux/CartSlice';
+import './ProductList.css';
 import CartItem from './CartItem';
+
+
 function ProductList({ onHomeClick }) {
     const [showCart, setShowCart] = useState(false);
-    const [showPlants, setShowPlants] = useState(false); // State to control the visibility of the About Us page
+    const [addedToCart, setAddedToCart] = useState({});
+
+    const dispatch = useDispatch();
+
+const handleAddToCart = (plant) => {
+    dispatch(addItem(plant));
+    setAddedToCart((prev) => ({
+        ...prev,
+        [plant.name]: true,
+    }));
+};
+
+
 
     const plantsArray = [
         {
@@ -274,9 +290,33 @@ function ProductList({ onHomeClick }) {
             </div>
             {!showCart ? (
                 <div className="product-grid">
+    {plantsArray.map((category, catIndex) => (
+        <div key={catIndex}>
+            <h2>{category.category}</h2>
 
+            <div className="plant-list">
+                {category.plants.map((plant, index) => (
+                    <div className="product-card" key={index}>
+                        <img src={plant.image} alt={plant.name} />
+                        <h3>{plant.name}</h3>
+                        <p>{plant.description}</p>
+                        <p>{plant.cost}</p>
 
-                </div>
+                        <button
+                            onClick={() => handleAddToCart(plant)}
+                            disabled={addedToCart[plant.name]}
+                        >
+                            {addedToCart[plant.name]
+                                ? "Added to Cart"
+                                : "Add to Cart"}
+                        </button>
+                    </div>
+                ))}
+            </div>
+        </div>
+    ))}
+</div>
+
             ) : (
                 <CartItem onContinueShopping={handleContinueShopping} />
             )}
